@@ -1,4 +1,4 @@
-import { Link, Head } from "@inertiajs/react";
+import { Head } from "@inertiajs/react";
 
 export default function GuestLayout({ children }) {
     return (

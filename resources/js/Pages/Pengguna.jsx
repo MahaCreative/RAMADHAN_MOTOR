@@ -85,7 +85,10 @@ export default function Pengguna(props) {
                 </button>
                 <div className="max-h-[80vh] overflow-y-auto">
                     {pengguna.map((item, key) => (
-                        <div className="bg-white/50 backdrop-blur-md py-2 px-4 flex justify-between items-center rounded-md my-3">
+                        <div
+                            key={key}
+                            className="bg-white/50 backdrop-blur-md py-2 px-4 flex justify-between items-center rounded-md my-3"
+                        >
                             <div className="">
                                 <h3 className="text-red-500 text-sm">
                                     {item.nama}
