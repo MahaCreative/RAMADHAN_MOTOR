@@ -4,7 +4,7 @@ export default function GuestLayout({ children }) {
     return (
         <>
             <Head title="Welcome" />
-            <div className="relative max-w-[390px] max-h-[844px] sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 bg-dots-lighter bg-gray-900 selection:bg-red-500 selection:text-white py-4 px-4 overflow-x-hidden overflow-y-hidden">
+            <div className="relative max-w-[390px] max-h-[844px] sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center  bg-dots-lighter bg-gray-900 selection:bg-red-500 selection:text-white py-4 px-4 overflow-x-hidden overflow-y-hidden">
                 {/* <div className="relative  sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 bg-dots-lighter bg-gray-900 selection:bg-red-500 selection:text-white py-4 px-4 "> */}
                 {children}
             </div>

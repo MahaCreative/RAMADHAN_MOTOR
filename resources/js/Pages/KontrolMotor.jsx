@@ -124,7 +124,7 @@ export default function KontrolMotor({ menu }) {
                 <div className="bg-white/50 backdrop-blur-md py-2 px-4 flex justify-between items-center rounded-md my-3">
                     {prediksi ? (
                         <>
-                            {screenshot && (
+                            {screenshot != null && (
                                 <div className="mt-4">
                                     <h3 className="text-center">
                                         Captured Image:
