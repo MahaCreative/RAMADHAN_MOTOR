@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import * as faceapi from "face-api.js";
 import ReactLoading from "react-loading";
-export default function KontrolMotor({ menu }) {
+export default function KontrolMotor({ menu, pengguna }) {
     const webcamRef = useRef(null);
+    const [label, setLabel] = useState(false);
     const [loading, setLoading] = useState(false);
     const [countdown, setCountdown] = useState(0);
     const videoConstraints = {
@@ -16,10 +17,32 @@ export default function KontrolMotor({ menu }) {
     const [datawajah, setDatawajah] = useState({ status_kenal: "", nama: "" });
     const capture = () => {
         const imageSrc = webcamRef.current.getScreenshot();
-        setScreenshot("/storage/zuran/zuran1.jpg");
+        setScreenshot(imageSrc);
         setPrediksi(true);
         setLoading(true);
     };
+    useEffect(() => {
+        let lab = [];
+        pengguna.map((item) => lab.push(item.nama));
+        setLabel(lab);
+    }, [pengguna]);
+    useEffect(() => {
+        async function loadModels() {
+            try {
+                await Promise.all([
+                    faceapi.nets.ageGenderNet.loadFromUri("/models"),
+                    faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+                    faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
+                    faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+                    faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+                    faceapi.nets.faceExpressionNet.loadFromUri("/models"),
+                ]);
+            } catch (error) {
+                console.error("Failed to load models:", error);
+            }
+        }
+        loadModels();
+    }, []);
     useEffect(() => {
         let timer;
         if (countdown > 0) {
@@ -40,40 +63,6 @@ export default function KontrolMotor({ menu }) {
         setCountdown(0);
         setDatawajah({ ...datawajah, status_kenal: false, nama: "" });
     };
-
-    useEffect(() => {
-        const loadModels = async () => {
-            try {
-                const MODEL_URL =
-                    "https://b92b-182-1-194-19.ngrok-free.app/models";
-                const modelBasePath = `${MODEL_URL}/weights`;
-
-                // Memuat model Tiny Face Detector
-                await faceapi.nets.tinyFaceDetector.loadFromDisk(
-                    `${modelBasePath}/tiny_face_detector`
-                );
-
-                // Memuat model Face Landmark 68
-                await faceapi.nets.faceLandmark68Net.loadFromDisk(
-                    `${modelBasePath}/face_landmark_68`
-                );
-
-                // Memuat model Face Recognition
-                await faceapi.nets.faceRecognitionNet.loadFromDisk(
-                    `${modelBasePath}/face_recognition`
-                );
-
-                // Memuat model SSD Mobilenet V1
-                await faceapi.nets.ssdMobilenetv1.loadFromDisk(
-                    `${modelBasePath}/ssd_mobilenetv1`
-                );
-
-                console.log("Models loaded successfully.");
-            } catch (error) {
-                console.error("Error loading models:", error);
-            }
-        };
-    }, []);
 
     useEffect(() => {
         if (screenshot) {
@@ -123,13 +112,12 @@ export default function KontrolMotor({ menu }) {
     }, [screenshot, prediksi]);
 
     const loadLabeledImages = async () => {
-        const labels = ["Guntur", "zuran"]; // Ganti dengan label yang sebenarnya
         return Promise.all(
-            labels.map(async (label) => {
+            label.map(async (labels) => {
                 const descriptions = [];
                 for (let i = 1; i <= 7; i++) {
                     const img = await faceapi.fetchImage(
-                        `/storage/${label}/${label}${i}.jpg`
+                        `/storage/${labels}/${labels}${i}.jpg`
                     );
                     const detections = await faceapi
                         .detectSingleFace(img)
@@ -139,7 +127,7 @@ export default function KontrolMotor({ menu }) {
                         descriptions.push(detections.descriptor);
                     }
                 }
-                return new faceapi.LabeledFaceDescriptors(label, descriptions);
+                return new faceapi.LabeledFaceDescriptors(labels, descriptions);
             })
         );
     };
@@ -166,9 +154,9 @@ export default function KontrolMotor({ menu }) {
                 <div
                     className={`${
                         menu == "kontrol" ? "translate-x-0" : "translate-x-full"
-                    } transition-all duration-300 ease-in-out -translate-y-28`}
+                    } transition-all duration-300 ease-in-out `}
                 >
-                    <div className="max-h-[80vh] overflow-y-auto">
+                    <div className="overflow-y-auto">
                         <div className="bg-white/50 backdrop-blur-md py-2 px-4 flex justify-between items-center rounded-md my-3">
                             {prediksi ? (
                                 <>

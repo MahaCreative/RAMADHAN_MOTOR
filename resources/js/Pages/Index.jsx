@@ -35,7 +35,7 @@ export default function Index(props) {
             </div>
             <div className="my-3">
                 <Pengguna menu={menu} pengguna={pengguna} />
-                <KontrolMotor menu={menu} />
+                <KontrolMotor pengguna={pengguna} menu={menu} />
             </div>
         </div>
     );

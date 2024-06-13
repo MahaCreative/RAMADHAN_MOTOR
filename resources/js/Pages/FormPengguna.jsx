@@ -37,7 +37,7 @@ export default function FormPengguna({ setOpen }) {
             },
             onFinish: () => {
                 setLoading(false);
-                setModalTambah(false);
+                setOpen();
             },
         });
         // Proses pengiriman data menggunakan post
