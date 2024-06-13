@@ -69,52 +69,56 @@ export default function Pengguna(props) {
                     </>
                 )}
             </Modals>
-            <div
-                className={`${
-                    menu == "pengguna" ? "translate-x-0" : "translate-x-full"
-                } transition-all duration-300 ease-in-out`}
-            >
-                <button
-                    onClick={() => {
-                        setModalTambah(true);
-                        setOpen(false);
-                    }}
-                    className="bg-blue-500 py-2 px-2 rounded-md text-white text-base"
+            {menu == "pengguna" && (
+                <div
+                    className={`${
+                        menu == "pengguna"
+                            ? "translate-x-0"
+                            : "translate-x-full"
+                    } transition-all duration-300 ease-in-out`}
                 >
-                    <Add color="inherit" fontSize="inherit" />
-                </button>
-                <div className="max-h-[80vh] overflow-y-auto">
-                    {pengguna.map((item, key) => (
-                        <div
-                            key={key}
-                            className="bg-white/50 backdrop-blur-md py-2 px-4 flex justify-between items-center rounded-md my-3"
-                        >
-                            <div className="">
-                                <h3 className="text-red-500 text-sm">
-                                    {item.nama}
-                                </h3>
-                                <p className="text-xs">
-                                    Jumlah Foto {item.foto.length}
-                                </p>
+                    <button
+                        onClick={() => {
+                            setModalTambah(true);
+                            setOpen(false);
+                        }}
+                        className="bg-blue-500 py-2 px-2 rounded-md text-white text-base"
+                    >
+                        <Add color="inherit" fontSize="inherit" />
+                    </button>
+                    <div className="max-h-[80vh] overflow-y-auto">
+                        {pengguna.map((item, key) => (
+                            <div
+                                key={key}
+                                className="bg-white/50 backdrop-blur-md py-2 px-4 flex justify-between items-center rounded-md my-3"
+                            >
+                                <div className="">
+                                    <h3 className="text-red-500 text-sm">
+                                        {item.nama}
+                                    </h3>
+                                    <p className="text-xs">
+                                        Jumlah Foto {item.foto.length}
+                                    </p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => deleteData(item)}
+                                        className="bg-red-500/90 rounded-md py-2 px-2 text-xs text-white active:bg-red-600 transition-all ease-in-out duration-300"
+                                    >
+                                        Delete
+                                    </button>
+                                    <button
+                                        onClick={() => showItem(item)}
+                                        className="bg-green-500/90 rounded-md py-2 px-2 text-xs text-white active:bg-green-600 transition-all ease-in-out duration-300"
+                                    >
+                                        Show
+                                    </button>
+                                </div>
                             </div>
-                            <div className="flex gap-3">
-                                <button
-                                    onClick={() => deleteData(item)}
-                                    className="bg-red-500/90 rounded-md py-2 px-2 text-xs text-white active:bg-red-600 transition-all ease-in-out duration-300"
-                                >
-                                    Delete
-                                </button>
-                                <button
-                                    onClick={() => showItem(item)}
-                                    className="bg-green-500/90 rounded-md py-2 px-2 text-xs text-white active:bg-green-600 transition-all ease-in-out duration-300"
-                                >
-                                    Show
-                                </button>
-                            </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
         </>
     );
 }

@@ -43,27 +43,36 @@ export default function KontrolMotor({ menu }) {
 
     useEffect(() => {
         const loadModels = async () => {
-  try {
-    const MODEL_URL = 'https://b92b-182-1-194-19.ngrok-free.app/models';
-    const modelBasePath = `${MODEL_URL}/weights`;
+            try {
+                const MODEL_URL =
+                    "https://b92b-182-1-194-19.ngrok-free.app/models";
+                const modelBasePath = `${MODEL_URL}/weights`;
 
-    // Memuat model Tiny Face Detector
-    await faceapi.nets.tinyFaceDetector.loadFromDisk(`${modelBasePath}/tiny_face_detector`);
+                // Memuat model Tiny Face Detector
+                await faceapi.nets.tinyFaceDetector.loadFromDisk(
+                    `${modelBasePath}/tiny_face_detector`
+                );
 
-    // Memuat model Face Landmark 68
-    await faceapi.nets.faceLandmark68Net.loadFromDisk(`${modelBasePath}/face_landmark_68`);
+                // Memuat model Face Landmark 68
+                await faceapi.nets.faceLandmark68Net.loadFromDisk(
+                    `${modelBasePath}/face_landmark_68`
+                );
 
-    // Memuat model Face Recognition
-    await faceapi.nets.faceRecognitionNet.loadFromDisk(`${modelBasePath}/face_recognition`);
+                // Memuat model Face Recognition
+                await faceapi.nets.faceRecognitionNet.loadFromDisk(
+                    `${modelBasePath}/face_recognition`
+                );
 
-    // Memuat model SSD Mobilenet V1
-    await faceapi.nets.ssdMobilenetv1.loadFromDisk(`${modelBasePath}/ssd_mobilenetv1`);
+                // Memuat model SSD Mobilenet V1
+                await faceapi.nets.ssdMobilenetv1.loadFromDisk(
+                    `${modelBasePath}/ssd_mobilenetv1`
+                );
 
-    console.log('Models loaded successfully.');
-  } catch (error) {
-    console.error('Error loading models:', error);
-  }
-};
+                console.log("Models loaded successfully.");
+            } catch (error) {
+                console.error("Error loading models:", error);
+            }
+        };
     }, []);
 
     useEffect(() => {
@@ -153,94 +162,98 @@ export default function KontrolMotor({ menu }) {
                 </div>
             )}
 
-            <div
-                className={`${
-                    menu == "kontrol" ? "translate-x-0" : "translate-x-full"
-                } transition-all duration-300 ease-in-out -translate-y-28`}
-            >
-                <div className="max-h-[80vh] overflow-y-auto">
-                    <div className="bg-white/50 backdrop-blur-md py-2 px-4 flex justify-between items-center rounded-md my-3">
+            {menu == "kontrol" && (
+                <div
+                    className={`${
+                        menu == "kontrol" ? "translate-x-0" : "translate-x-full"
+                    } transition-all duration-300 ease-in-out -translate-y-28`}
+                >
+                    <div className="max-h-[80vh] overflow-y-auto">
+                        <div className="bg-white/50 backdrop-blur-md py-2 px-4 flex justify-between items-center rounded-md my-3">
+                            {prediksi ? (
+                                <>
+                                    {screenshot != null && (
+                                        <div className="mt-4">
+                                            <h3 className="text-center">
+                                                Captured Image:
+                                            </h3>
+                                            <img
+                                                src={screenshot}
+                                                alt="Screenshot"
+                                                className="mt-2"
+                                            />
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <div>
+                                    <Webcam
+                                        audio={false}
+                                        height={480}
+                                        width={640}
+                                        videoConstraints={videoConstraints}
+                                        ref={webcamRef}
+                                        screenshotFormat="image/jpeg"
+                                    />
+                                </div>
+                            )}
+                        </div>
                         {prediksi ? (
                             <>
-                                {screenshot != null && (
-                                    <div className="mt-4">
-                                        <h3 className="text-center">
-                                            Captured Image:
-                                        </h3>
-                                        <img
-                                            src={screenshot}
-                                            alt="Screenshot"
-                                            className="mt-2"
-                                        />
+                                {datawajah.status_kenal ? (
+                                    <>
+                                        <p className="text-white text-sm">
+                                            Silahkan Menyalakan Motor Selama{" "}
+                                            {countdown} detik. Jika waktu telah
+                                            habis anda perlu melakukan foto
+                                            ulang
+                                        </p>
+
+                                        <div>
+                                            <p className="text-red-500 capitalize">
+                                                {datawajah.nama}
+                                            </p>
+                                            <button
+                                                onClick={staterMotor}
+                                                className="text-center bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500 text-white py-2 px-4 active:scale-105 cursor-pointer justify-center"
+                                            >
+                                                Stater Motor
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="bg-white my-3 py-2 px-3 text-red-500">
+                                        <p className="text-red-500 capitalize font-bold">
+                                            {datawajah.nama}
+                                        </p>
+                                        <p className="text-xs">
+                                            Hasil prediksi menyatakan anda tidak
+                                            terdaftar sebagai pengguna
+                                            kendaraan. anda tidak bisa
+                                            menyalakan stater motor
+                                        </p>
+                                        <button
+                                            onClick={prediksiUlang}
+                                            className="text-center bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500 text-white py-2 px-4 active:scale-105 cursor-pointer justify-center"
+                                        >
+                                            Ambil ulang gambar
+                                        </button>
                                     </div>
                                 )}
                             </>
                         ) : (
-                            <div>
-                                <Webcam
-                                    audio={false}
-                                    height={480}
-                                    width={640}
-                                    videoConstraints={videoConstraints}
-                                    ref={webcamRef}
-                                    screenshotFormat="image/jpeg"
-                                />
-                            </div>
+                            <>
+                                <button
+                                    onClick={capture}
+                                    className="text-center bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500 text-red-500 py-2 px-4 active:scale-105 cursor-pointer justify-center"
+                                >
+                                    Take Picture For Prediction
+                                </button>
+                            </>
                         )}
                     </div>
-                    {prediksi ? (
-                        <>
-                            {datawajah.status_kenal ? (
-                                <>
-                                    <p className="text-white text-sm">
-                                        Silahkan Menyalakan Motor Selama{" "}
-                                        {countdown} detik. Jika waktu telah
-                                        habis anda perlu melakukan foto ulang
-                                    </p>
-
-                                    <div>
-                                        <p className="text-red-500 capitalize">
-                                            {datawajah.nama}
-                                        </p>
-                                        <button
-                                            onClick={staterMotor}
-                                            className="text-center bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500 text-white py-2 px-4 active:scale-105 cursor-pointer justify-center"
-                                        >
-                                            Stater Motor
-                                        </button>
-                                    </div>
-                                </>
-                            ) : (
-                                <div className="bg-white my-3 py-2 px-3 text-red-500">
-                                    <p className="text-red-500 capitalize font-bold">
-                                        {datawajah.nama}
-                                    </p>
-                                    <p className="text-xs">
-                                        Hasil prediksi menyatakan anda tidak
-                                        terdaftar sebagai pengguna kendaraan.
-                                        anda tidak bisa menyalakan stater motor
-                                    </p>
-                                    <button
-                                        onClick={prediksiUlang}
-                                        className="text-center bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500 text-white py-2 px-4 active:scale-105 cursor-pointer justify-center"
-                                    >
-                                        Ambil ulang gambar
-                                    </button>
-                                </div>
-                            )}
-                        </>
-                    ) : (
-                        <>
-                            <button
-                                onClick={capture}
-                                className="text-center bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500 text-red-500 py-2 px-4 active:scale-105 cursor-pointer justify-center"
-                            >
-                                Take Picture For Prediction
-                            </button>
-                        </>
-                    )}
                 </div>
-            </div>
+            )}
         </>
     );
 }
