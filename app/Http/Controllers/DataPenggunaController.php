@@ -13,9 +13,7 @@ class DataPenggunaController extends Controller
     {
         // dd($request->all());
 
-        $request->validate([
-            'nama' => 'required|string|max:255',
-        ]);
+
 
         $pengguna = Pengguna::create(['nama' => $request->nama]);
 
@@ -28,6 +26,7 @@ class DataPenggunaController extends Controller
             $fotoUrl = $file['file']->storeAs($filename);
             FotoPengguna::create(['pengguna_id' => $pengguna->id, 'foto' => $fotoUrl]);
         }
+        return redirect()->back();
     }
     public function deletePengguna(Request $request)
     {

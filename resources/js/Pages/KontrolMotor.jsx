@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import * as faceapi from "face-api.js";
+import ReactLoading from "react-loading";
 export default function KontrolMotor({ menu }) {
     const webcamRef = useRef(null);
+    const [loading, setLoading] = useState(false);
     const [countdown, setCountdown] = useState(0);
     const videoConstraints = {
         width: 1280,
@@ -14,9 +16,9 @@ export default function KontrolMotor({ menu }) {
     const [datawajah, setDatawajah] = useState({ status_kenal: "", nama: "" });
     const capture = () => {
         const imageSrc = webcamRef.current.getScreenshot();
-        setScreenshot(imageSrc);
+        setScreenshot("/storage/zuran/zuran1.jpg");
         setPrediksi(true);
-        setCountdown(60); // Set countdown to 60 seconds
+        setLoading(true);
     };
     useEffect(() => {
         let timer;
@@ -27,6 +29,7 @@ export default function KontrolMotor({ menu }) {
         } else if (countdown === 0) {
             clearInterval(timer);
             setPrediksi(false);
+            setDatawajah({ ...datawajah, status_kenal: false, nama: "" });
         }
 
         return () => clearInterval(timer);
@@ -40,18 +43,31 @@ export default function KontrolMotor({ menu }) {
 
     useEffect(() => {
         const loadModels = async () => {
-            const MODEL_URL = "/models";
-            await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-            await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-            await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-            await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
-        };
+  try {
+    const MODEL_URL = 'https://b92b-182-1-194-19.ngrok-free.app/models';
+    const modelBasePath = `${MODEL_URL}/weights`;
 
-        loadModels();
+    // Memuat model Tiny Face Detector
+    await faceapi.nets.tinyFaceDetector.loadFromDisk(`${modelBasePath}/tiny_face_detector`);
+
+    // Memuat model Face Landmark 68
+    await faceapi.nets.faceLandmark68Net.loadFromDisk(`${modelBasePath}/face_landmark_68`);
+
+    // Memuat model Face Recognition
+    await faceapi.nets.faceRecognitionNet.loadFromDisk(`${modelBasePath}/face_recognition`);
+
+    // Memuat model SSD Mobilenet V1
+    await faceapi.nets.ssdMobilenetv1.loadFromDisk(`${modelBasePath}/ssd_mobilenetv1`);
+
+    console.log('Models loaded successfully.');
+  } catch (error) {
+    console.error('Error loading models:', error);
+  }
+};
     }, []);
 
     useEffect(() => {
-        if (screenshot && prediksi) {
+        if (screenshot) {
             const img = new Image();
             img.src = screenshot;
             img.onload = async () => {
@@ -59,7 +75,8 @@ export default function KontrolMotor({ menu }) {
                     .detectAllFaces(img, new faceapi.TinyFaceDetectorOptions())
                     .withFaceLandmarks()
                     .withFaceDescriptors();
-                if (detections.length > 0) {
+
+                if (detections && detections.length > 0) {
                     const labeledDescriptors = await loadLabeledImages();
                     const faceMatcher = new faceapi.FaceMatcher(
                         labeledDescriptors,
@@ -72,37 +89,46 @@ export default function KontrolMotor({ menu }) {
                     const results = resizedDetections.map((d) =>
                         faceMatcher.findBestMatch(d.descriptor)
                     );
-                    results.forEach((result, i) => {
+
+                    results.forEach((result) => {
                         if (result.label !== "unknown") {
                             setDatawajah({
                                 status_kenal: true,
                                 nama: result.label,
                             });
+                            setCountdown(60);
                         } else {
-                            setDatawajah({ status_kenal: false, nama: "" });
+                            console.log("abg");
+                            setDatawajah({
+                                status_kenal: false,
+                                nama: "unknow",
+                            });
                         }
                     });
                 } else {
                     setDatawajah({ status_kenal: false, nama: "" });
                 }
+                setLoading(false);
             };
         }
     }, [screenshot, prediksi]);
 
     const loadLabeledImages = async () => {
-        const labels = ["Guntur", "Person2"]; // Replace with actual labels
+        const labels = ["Guntur", "zuran"]; // Ganti dengan label yang sebenarnya
         return Promise.all(
             labels.map(async (label) => {
                 const descriptions = [];
-                for (let i = 1; i <= 2; i++) {
+                for (let i = 1; i <= 7; i++) {
                     const img = await faceapi.fetchImage(
-                        `/labeled_images/${label}/${i}.jpg`
+                        `/storage/${label}/${label}${i}.jpg`
                     );
                     const detections = await faceapi
                         .detectSingleFace(img)
                         .withFaceLandmarks()
                         .withFaceDescriptor();
-                    descriptions.push(detections.descriptor);
+                    if (detections && detections.descriptor) {
+                        descriptions.push(detections.descriptor);
+                    }
                 }
                 return new faceapi.LabeledFaceDescriptors(label, descriptions);
             })
@@ -110,92 +136,111 @@ export default function KontrolMotor({ menu }) {
     };
 
     const staterMotor = () => {
-        // Logic for starting motor goes here
-        console.log("Motor started");
+        // Logika untuk menyalakan motor di sini
+        console.log("Motor dinyalakan");
     };
 
     return (
-        <div
-            className={`${
-                menu == "kontrol" ? "translate-x-0" : "translate-x-full"
-            } transition-all duration-300 ease-in-out -translate-y-28`}
-        >
-            <div className="max-h-[80vh] overflow-y-auto">
-                <div className="bg-white/50 backdrop-blur-md py-2 px-4 flex justify-between items-center rounded-md my-3">
+        <>
+            {loading && (
+                <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-slate-700/50 z-50">
+                    <ReactLoading
+                        type={"spinningBubbles"}
+                        color="#fff"
+                        height={"20%"}
+                        width={"20%"}
+                    />
+                </div>
+            )}
+
+            <div
+                className={`${
+                    menu == "kontrol" ? "translate-x-0" : "translate-x-full"
+                } transition-all duration-300 ease-in-out -translate-y-28`}
+            >
+                <div className="max-h-[80vh] overflow-y-auto">
+                    <div className="bg-white/50 backdrop-blur-md py-2 px-4 flex justify-between items-center rounded-md my-3">
+                        {prediksi ? (
+                            <>
+                                {screenshot != null && (
+                                    <div className="mt-4">
+                                        <h3 className="text-center">
+                                            Captured Image:
+                                        </h3>
+                                        <img
+                                            src={screenshot}
+                                            alt="Screenshot"
+                                            className="mt-2"
+                                        />
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <div>
+                                <Webcam
+                                    audio={false}
+                                    height={480}
+                                    width={640}
+                                    videoConstraints={videoConstraints}
+                                    ref={webcamRef}
+                                    screenshotFormat="image/jpeg"
+                                />
+                            </div>
+                        )}
+                    </div>
                     {prediksi ? (
                         <>
-                            {screenshot != null && (
-                                <div className="mt-4">
-                                    <h3 className="text-center">
-                                        Captured Image:
-                                    </h3>
-                                    <img
-                                        src={screenshot}
-                                        alt="Screenshot"
-                                        className="mt-2"
-                                    />
+                            {datawajah.status_kenal ? (
+                                <>
+                                    <p className="text-white text-sm">
+                                        Silahkan Menyalakan Motor Selama{" "}
+                                        {countdown} detik. Jika waktu telah
+                                        habis anda perlu melakukan foto ulang
+                                    </p>
+
+                                    <div>
+                                        <p className="text-red-500 capitalize">
+                                            {datawajah.nama}
+                                        </p>
+                                        <button
+                                            onClick={staterMotor}
+                                            className="text-center bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500 text-white py-2 px-4 active:scale-105 cursor-pointer justify-center"
+                                        >
+                                            Stater Motor
+                                        </button>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="bg-white my-3 py-2 px-3 text-red-500">
+                                    <p className="text-red-500 capitalize font-bold">
+                                        {datawajah.nama}
+                                    </p>
+                                    <p className="text-xs">
+                                        Hasil prediksi menyatakan anda tidak
+                                        terdaftar sebagai pengguna kendaraan.
+                                        anda tidak bisa menyalakan stater motor
+                                    </p>
+                                    <button
+                                        onClick={prediksiUlang}
+                                        className="text-center bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500 text-white py-2 px-4 active:scale-105 cursor-pointer justify-center"
+                                    >
+                                        Ambil ulang gambar
+                                    </button>
                                 </div>
                             )}
                         </>
                     ) : (
-                        <div>
-                            <Webcam
-                                audio={false}
-                                height={480}
-                                width={640}
-                                videoConstraints={videoConstraints}
-                                ref={webcamRef}
-                                screenshotFormat="image/jpeg"
-                            />
-                        </div>
+                        <>
+                            <button
+                                onClick={capture}
+                                className="text-center bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500 text-red-500 py-2 px-4 active:scale-105 cursor-pointer justify-center"
+                            >
+                                Take Picture For Prediction
+                            </button>
+                        </>
                     )}
                 </div>
-                {prediksi ? (
-                    <>
-                        <p className="text-white text-sm">
-                            Silahkan Menyalakan Motor Selama {countdown} detik.
-                            Jika waktu telah habis anda perlu melakukan foto
-                            ulang
-                        </p>
-                        {datawajah.status_kenal ? (
-                            <>
-                                <div>
-                                    <p className="text-red-500 capitalize">
-                                        {datawajah.nama}
-                                    </p>
-                                    <button
-                                        onClick={staterMotor}
-                                        className="text-center bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500 text-white py-2 px-4 active:scale-105 cursor-pointer justify-center"
-                                    >
-                                        Stater Motor
-                                    </button>
-                                </div>
-                            </>
-                        ) : (
-                            <div className="bg-white my-3 py-2 px-3 text-red-500">
-                                <p className="text-xs">
-                                    Hasil prediksi menyatakan anda tidak
-                                    terdaftar sebagai pengguna kendaraan. anda
-                                    tidak bisa menyalakan stater motor
-                                </p>
-                                <button
-                                    onClick={prediksiUlang}
-                                    className="text-center bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500 text-white py-2 px-4 active:scale-105 cursor-pointer justify-center"
-                                >
-                                    Ambil ulang gambar
-                                </button>
-                            </div>
-                        )}
-                    </>
-                ) : (
-                    <button
-                        onClick={capture}
-                        className="text-center bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500 text-red-500 py-2 px-4 active:scale-105 cursor-pointer justify-center"
-                    >
-                        Take Picture For Prediction
-                    </button>
-                )}
             </div>
-        </div>
+        </>
     );
 }
