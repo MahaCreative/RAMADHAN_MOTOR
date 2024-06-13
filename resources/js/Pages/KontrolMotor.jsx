@@ -189,7 +189,7 @@ export default function KontrolMotor({ menu }) {
                                 <div>
                                     <Webcam
                                         audio={false}
-                                        height={480}
+                                        height={280}
                                         width={640}
                                         videoConstraints={videoConstraints}
                                         ref={webcamRef}
