@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use PhpMqtt\Client\Facades\MQTT;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,3 +26,7 @@ Route::get('/', function () {
 Route::post('create-pengguna', [DataPenggunaController::class, 'createPengguna'])->name('create-pengguna');
 Route::delete('delete-pengguna', [DataPenggunaController::class, 'deletePengguna'])->name('delete-pengguna');
 Route::delete('delete-foto-pengguna', [DataPenggunaController::class, 'deleteFotoPengguna'])->name('delete-foto-pengguna');
+Route::get('sent-mqtt', function () {
+    MQTT::publish('topic', 'Hello World!');
+    return response()->json('abg');
+});

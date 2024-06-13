@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import * as faceapi from "face-api.js";
 import ReactLoading from "react-loading";
+import mqtt from "mqtt";
 export default function KontrolMotor({ menu, pengguna }) {
     const webcamRef = useRef(null);
     const [label, setLabel] = useState(false);
@@ -12,6 +13,7 @@ export default function KontrolMotor({ menu, pengguna }) {
         height: 720,
         facingMode: "user",
     };
+
     const [screenshot, setScreenshot] = useState(null);
     const [prediksi, setPrediksi] = useState(false);
     const [datawajah, setDatawajah] = useState({ status_kenal: "", nama: "" });
@@ -132,9 +134,20 @@ export default function KontrolMotor({ menu, pengguna }) {
         );
     };
 
-    const staterMotor = () => {
-        // Logika untuk menyalakan motor di sini
-        console.log("Motor dinyalakan");
+    const staterMotor = async () => {
+        try {
+            const response = await fetch("/sent-mqtt", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const responseData = await response.json();
+            console.log(responseData);
+        } catch (error) {
+            console.error("Error posting data:", error);
+        }
     };
 
     return (
