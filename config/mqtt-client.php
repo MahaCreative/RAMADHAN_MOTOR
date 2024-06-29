@@ -34,7 +34,7 @@ return [
 
         'default' => [
 
-            'host' => "test.mosquitto.org",
+            'host' => "broker.hivemq.com",
             'port' => env('MQTT_PORT', 1883),
 
             // The MQTT protocol version used for the connection.
