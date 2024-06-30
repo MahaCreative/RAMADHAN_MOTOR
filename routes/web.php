@@ -19,9 +19,7 @@ use PhpMqtt\Client\Facades\MQTT;
 |
 */
 
-Route::get('/', function () {
-    return inertia('welcom');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::post('create-pengguna', [DataPenggunaController::class, 'createPengguna'])->name('create-pengguna');
 Route::delete('delete-pengguna', [DataPenggunaController::class, 'deletePengguna'])->name('delete-pengguna');
 Route::delete('delete-foto-pengguna', [DataPenggunaController::class, 'deleteFotoPengguna'])->name('delete-foto-pengguna');
