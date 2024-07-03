@@ -119,7 +119,7 @@ export default function KontrolMotor({ menu, pengguna }) {
                 const descriptions = [];
                 for (let i = 1; i <= 3; i++) {
                     const img = await faceapi.fetchImage(
-                        `/storage/${labels}/${labels}${i}.jpg`
+                        `/storage/${labels}/${labels}${i}.jpeg`
                     );
                     const detections = await faceapi
                         .detectSingleFace(img)
