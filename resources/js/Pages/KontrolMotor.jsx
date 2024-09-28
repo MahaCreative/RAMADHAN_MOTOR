@@ -72,13 +72,12 @@ export default function KontrolMotor({ menu, pengguna }) {
             const img = new Image();
             img.src = screenshot;
 
-            setLoading(false);
             img.onload = async () => {
                 const detections = await faceapi
                     .detectAllFaces(img, new faceapi.TinyFaceDetectorOptions())
                     .withFaceLandmarks()
                     .withFaceDescriptors();
-
+                setLoading(false);
                 if (detections && detections.length > 0) {
                     const labeledDescriptors = await loadLabeledImages();
                     const faceMatcher = new faceapi.FaceMatcher(
@@ -92,7 +91,7 @@ export default function KontrolMotor({ menu, pengguna }) {
                     const results = resizedDetections.map((d) =>
                         faceMatcher.findBestMatch(d.descriptor)
                     );
-                    setPrediksi(false);
+
                     setLoading(false);
                     results.forEach((result) => {
                         if (result.label !== "unknown") {
