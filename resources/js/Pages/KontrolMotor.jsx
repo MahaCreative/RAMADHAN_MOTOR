@@ -119,7 +119,7 @@ export default function KontrolMotor({ menu, pengguna }) {
         return Promise.all(
             label.map(async (labels) => {
                 const descriptions = [];
-                for (let i = 1; i <= 3; i++) {
+                for (let i = 1; i <= 8; i++) {
                     const img = await faceapi.fetchImage(
                         `/storage/${labels}/${labels}${i}.jpeg`
                     );
