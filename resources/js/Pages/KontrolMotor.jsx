@@ -92,7 +92,6 @@ export default function KontrolMotor({ menu, pengguna }) {
                         faceMatcher.findBestMatch(d.descriptor)
                     );
 
-                    setLoading(false);
                     results.forEach((result) => {
                         if (result.label !== "unknown") {
                             setDatawajah({
@@ -108,9 +107,12 @@ export default function KontrolMotor({ menu, pengguna }) {
                             });
                         }
                     });
+                    setLoading(false);
                 } else {
                     setDatawajah({ status_kenal: false, nama: "" });
+                    setLoading(false);
                 }
+                setLoading(false);
             };
         }
     }, [screenshot, prediksi]);

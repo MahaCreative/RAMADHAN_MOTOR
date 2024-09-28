@@ -34,6 +34,7 @@ export default function FormPengguna({ setOpen }) {
                     }
                 }
                 setErrors({ nama: err.nama, foto: fotoErrors[0] });
+                setLoading(false);
             },
             onFinish: () => {
                 setLoading(false);
