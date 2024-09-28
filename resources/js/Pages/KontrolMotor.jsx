@@ -62,6 +62,7 @@ export default function KontrolMotor({ menu, pengguna }) {
 
     const prediksiUlang = () => {
         setPrediksi(false);
+        setLoading(false);
         setCountdown(0);
         setDatawajah({ ...datawajah, status_kenal: false, nama: "" });
     };
@@ -75,6 +76,7 @@ export default function KontrolMotor({ menu, pengguna }) {
                     .detectAllFaces(img, new faceapi.TinyFaceDetectorOptions())
                     .withFaceLandmarks()
                     .withFaceDescriptors();
+                setPrediksi(false);
                 setLoading(false);
                 if (detections && detections.length > 0) {
                     const labeledDescriptors = await loadLabeledImages();
