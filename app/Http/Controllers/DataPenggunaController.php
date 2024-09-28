@@ -22,7 +22,7 @@ class DataPenggunaController extends Controller
         foreach ($files as $i => $file) {
 
 
-            $filename = $request->nama . '/' . $request->nama . $i . '.' . $file['file']->getClientOriginalExtension();
+            $filename = $request->nama . '/' . $request->nama . $i . '.' . 'jpeg';
             $fotoUrl = $file['file']->storeAs($filename);
             FotoPengguna::create(['pengguna_id' => $pengguna->id, 'foto' => $fotoUrl]);
         }

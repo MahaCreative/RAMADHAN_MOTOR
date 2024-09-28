@@ -75,7 +75,7 @@ export default function KontrolMotor({ menu, pengguna }) {
                     .detectAllFaces(img, new faceapi.TinyFaceDetectorOptions())
                     .withFaceLandmarks()
                     .withFaceDescriptors();
-
+                setLoading(false);
                 if (detections && detections.length > 0) {
                     const labeledDescriptors = await loadLabeledImages();
                     const faceMatcher = new faceapi.FaceMatcher(
@@ -108,7 +108,6 @@ export default function KontrolMotor({ menu, pengguna }) {
                 } else {
                     setDatawajah({ status_kenal: false, nama: "" });
                 }
-                setLoading(false);
             };
         }
     }, [screenshot, prediksi]);
