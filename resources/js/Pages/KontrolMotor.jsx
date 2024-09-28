@@ -62,7 +62,7 @@ export default function KontrolMotor({ menu, pengguna }) {
 
     const prediksiUlang = () => {
         setPrediksi(false);
-        setLoading(false);
+
         setCountdown(0);
         setDatawajah({ ...datawajah, status_kenal: false, nama: "" });
     };
@@ -71,7 +71,7 @@ export default function KontrolMotor({ menu, pengguna }) {
         if (screenshot) {
             const img = new Image();
             img.src = screenshot;
-            setPrediksi(false);
+
             setLoading(false);
             img.onload = async () => {
                 const detections = await faceapi
