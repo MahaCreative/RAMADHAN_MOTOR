@@ -77,7 +77,7 @@ export default function KontrolMotor({ menu, pengguna }) {
                     .detectAllFaces(img, new faceapi.TinyFaceDetectorOptions())
                     .withFaceLandmarks()
                     .withFaceDescriptors();
-                setLoading(false);
+                console.log("abg");
                 if (detections && detections.length > 0) {
                     const labeledDescriptors = await loadLabeledImages();
                     const faceMatcher = new faceapi.FaceMatcher(
